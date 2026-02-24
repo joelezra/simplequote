@@ -2,9 +2,22 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { addWaitlistSignup, getWaitlistCount } from "./db";
+import { z } from "zod";
+
+const TRADE_TYPES = [
+  "Plumbing",
+  "Electrical",
+  "HVAC",
+  "Painting",
+  "Carpentry",
+  "Roofing",
+  "Handyman",
+  "General Contracting",
+  "Other",
+] as const;
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -17,12 +30,33 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  waitlist: router({
+    signup: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email("Please enter a valid email address"),
+          tradeType: z.enum(TRADE_TYPES),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const result = await addWaitlistSignup(input.email, input.tradeType);
+        if (result.alreadyExists) {
+          return {
+            success: false,
+            message: "This email is already on the waitlist!",
+          };
+        }
+        return {
+          success: true,
+          message: "You're on the list! We'll be in touch soon.",
+        };
+      }),
+
+    count: publicProcedure.query(async () => {
+      const count = await getWaitlistCount();
+      return { count };
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

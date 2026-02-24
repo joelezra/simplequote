@@ -1,0 +1,21 @@
+# SimpleQuote Landing Page TODO
+
+- [x] Global theming: dark charcoal (#1A1A2E) bg, orange (#FF6B2B) accent, Inter font
+- [x] Database schema for waitlist signups
+- [x] Backend tRPC endpoints: signup + counter
+- [x] Sticky header with logo and CTA button
+- [x] Hero section with headline, subheadline, email form, trade dropdown, animated counter
+- [x] Problem/Solution split section (two columns, red/green tints)
+- [x] How It Works section (4 steps horizontal)
+- [x] Features grid (6 cards, 3x2)
+- [x] Trades We Serve section (horizontal icon row)
+- [x] Pricing teaser section (single centered card)
+- [x] Testimonials section (3 cards)
+- [x] FAQ accordion section (7 items)
+- [x] Final CTA section (full width, dark bg)
+- [x] Footer with links, social, legal
+- [x] Scroll animations (fade-in on scroll, counter tick-up, CTA pulse)
+- [x] Mobile-first responsive design
+- [x] Open Graph meta tags
+- [x] Smooth scroll between sections
+- [x] Vitest tests for backend endpoints

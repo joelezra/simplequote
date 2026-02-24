@@ -1,11 +1,10 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, waitlistSignups } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -89,4 +88,32 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function addWaitlistSignup(email: string, tradeType: string): Promise<{ success: boolean; alreadyExists: boolean }> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db.insert(waitlistSignups).values({ email, tradeType });
+    return { success: true, alreadyExists: false };
+  } catch (error: any) {
+    if (error?.code === "ER_DUP_ENTRY") {
+      return { success: false, alreadyExists: true };
+    }
+    throw error;
+  }
+}
+
+export async function getWaitlistCount(): Promise<number> {
+  const db = await getDb();
+  if (!db) {
+    return 0;
+  }
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(waitlistSignups);
+
+  return result[0]?.count ?? 0;
+}
