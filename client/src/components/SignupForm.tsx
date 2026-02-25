@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { trpc } from "@/lib/trpc";
+import { useWaitlistSignup } from "@/hooks/useWaitlistSignup";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -34,22 +34,7 @@ export function SignupForm({ onSuccess, variant = "hero" }: SignupFormProps) {
   const [tradeType, setTradeType] = useState<string>("");
   const [submitted, setSubmitted] = useState(false);
 
-  const utils = trpc.useUtils();
-  const signup = trpc.waitlist.signup.useMutation({
-    onSuccess: (data) => {
-      if (data.success) {
-        setSubmitted(true);
-        toast.success(data.message);
-        utils.waitlist.count.invalidate();
-        onSuccess?.();
-      } else {
-        toast.info(data.message);
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message || "Something went wrong. Please try again.");
-    },
-  });
+  const signup = useWaitlistSignup();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,10 +42,26 @@ export function SignupForm({ onSuccess, variant = "hero" }: SignupFormProps) {
       toast.error("Please fill in your email and select your trade.");
       return;
     }
-    signup.mutate({
-      email,
-      tradeType: tradeType as (typeof TRADE_TYPES)[number],
-    });
+    signup.mutate(
+      {
+        email,
+        tradeType: tradeType as (typeof TRADE_TYPES)[number],
+      },
+      {
+        onSuccess: (data) => {
+          if (data.success) {
+            setSubmitted(true);
+            toast.success(data.message);
+            onSuccess?.();
+          } else {
+            toast.info(data.message);
+          }
+        },
+        onError: (error) => {
+          toast.error(error.message || "Something went wrong. Please try again.");
+        },
+      },
+    );
   };
 
   if (submitted) {

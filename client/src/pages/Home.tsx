@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { useCountUp } from "@/hooks/useCountUp";
-import { trpc } from "@/lib/trpc";
+import { useWaitlistCount } from "@/hooks/useWaitlistCount";
 import {
   FileText,
   PenTool,
@@ -65,7 +65,7 @@ function StickyHeader() {
           </span>
         </button>
         <Button
-          onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth", block: "center" })}
           className="h-9 rounded-xl bg-[oklch(0.7_0.19_45)] text-sm font-semibold text-white hover:bg-[oklch(0.65_0.19_45)]"
         >
           Get Early Access
@@ -77,10 +77,8 @@ function StickyHeader() {
 
 // ─── 1. HERO ───────────────────────────────────────────────
 function HeroSection() {
-  const { data } = trpc.waitlist.count.useQuery(undefined, {
-    refetchInterval: 10000,
-  });
-  const count = useCountUp(data?.count ?? 0, 1500);
+  const waitlistCount = useWaitlistCount();
+  const count = useCountUp(waitlistCount, 1500);
 
   return (
     <section className="relative pt-28 pb-20 md:pt-36 md:pb-28 overflow-hidden">
@@ -403,7 +401,7 @@ function TradesSection() {
           <p className="text-center mt-8 text-sm text-[oklch(0.6_0_0)]">
             Don't see your trade? We're adding more every week.{" "}
             <button
-              onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth", block: "center" })}
               className="text-[oklch(0.7_0.19_45)] font-semibold hover:underline"
             >
               Request yours.
@@ -422,37 +420,92 @@ function PricingSection() {
       <div className="absolute inset-0 bg-grid-pattern opacity-20" />
       <div className="container relative">
         <AnimatedSection>
-          <div className="max-w-lg mx-auto">
-            <div className="rounded-2xl border border-[oklch(0.7_0.19_45_/_25%)] bg-[oklch(0.2_0.015_280)] p-8 md:p-10 text-center relative overflow-hidden">
+          <div className="text-center mb-14">
+            <p className="text-sm font-semibold uppercase tracking-widest text-[oklch(0.7_0.19_45)] mb-3">
+              Pricing
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">
+              Start free. Upgrade when you're ready.
+            </h2>
+          </div>
+        </AnimatedSection>
+
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          {/* Free Tier */}
+          <AnimatedSection delay={100}>
+            <div className="rounded-2xl border border-[oklch(1_0_0_/_8%)] bg-[oklch(0.2_0.015_280)] p-8 h-full flex flex-col">
+              <p className="text-sm font-semibold uppercase tracking-widest text-[oklch(0.6_0_0)] mb-4">
+                Free
+              </p>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className="text-4xl font-black text-white">$0</span>
+                <span className="text-lg text-[oklch(0.6_0_0)]">/mo</span>
+              </div>
+              <p className="text-sm text-[oklch(0.6_0_0)] mb-6">
+                No credit card required. Forever.
+              </p>
+
+              <ul className="space-y-3 text-left mb-8 flex-1">
+                {[
+                  "3 quotes per month",
+                  "3 invoices per month",
+                  "Trade-specific templates",
+                  "PDF export",
+                  "Basic payment tracking",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <Check className="size-4 text-[oklch(0.7_0.18_145)] shrink-0" />
+                    <span className="text-sm text-[oklch(0.8_0_0)]">{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                variant="outline"
+                className="w-full h-12 rounded-xl border-[oklch(1_0_0_/_15%)] text-base font-bold text-white hover:bg-[oklch(1_0_0_/_5%)]"
+              >
+                Get Started — Free
+              </Button>
+            </div>
+          </AnimatedSection>
+
+          {/* Pro Tier */}
+          <AnimatedSection delay={200}>
+            <div className="rounded-2xl border border-[oklch(0.7_0.19_45_/_25%)] bg-[oklch(0.2_0.015_280)] p-8 h-full flex flex-col relative overflow-hidden">
               {/* Glow effect */}
               <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-60 h-40 bg-[oklch(0.7_0.19_45_/_12%)] rounded-full blur-[80px]" />
 
-              <div className="relative">
-                <p className="text-sm font-semibold uppercase tracking-widest text-[oklch(0.7_0.19_45)] mb-4">
-                  Early Bird Pricing
-                </p>
-
-                <div className="flex items-baseline justify-center gap-3 mb-2">
-                  <span className="text-2xl text-[oklch(0.5_0_0)] line-through">
-                    $9.99/mo
+              <div className="relative flex flex-col h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <p className="text-sm font-semibold uppercase tracking-widest text-[oklch(0.7_0.19_45)]">
+                    Pro
+                  </p>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[oklch(0.7_0.19_45)] text-white px-2.5 py-0.5 rounded-full">
+                    Most Popular
                   </span>
-                  <span className="text-5xl md:text-6xl font-black text-white">
-                    $4.99
-                  </span>
-                  <span className="text-lg text-[oklch(0.6_0_0)]">/mo</span>
                 </div>
 
-                <p className="text-[oklch(0.7_0.19_45)] font-semibold mb-6">
-                  Locked In Forever
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-xl text-[oklch(0.5_0_0)] line-through">
+                    $9.99
+                  </span>
+                  <span className="text-4xl font-black text-white">$4.99</span>
+                  <span className="text-lg text-[oklch(0.6_0_0)]">/mo</span>
+                </div>
+                <p className="text-sm text-[oklch(0.7_0.19_45)] font-semibold mb-6">
+                  Early bird — locked in forever
                 </p>
 
-                <ul className="space-y-3 text-left max-w-xs mx-auto mb-8">
+                <ul className="space-y-3 text-left mb-6 flex-1">
                   {[
                     "Unlimited quotes & invoices",
                     "E-signatures",
-                    "Live tracking",
-                    "QuickBooks export",
-                    "PDF reports",
+                    "Live open & read tracking",
+                    "QuickBooks sync",
+                    "PDF reports & CSV export",
+                    "Branded quotes with your logo",
+                    "Priority support",
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
                       <Check className="size-4 text-[oklch(0.7_0.18_145)] shrink-0" />
@@ -468,15 +521,15 @@ function PricingSection() {
                 </div>
 
                 <Button
-                  onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth" })}
+                  onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth", block: "center" })}
                   className="w-full h-12 rounded-xl bg-[oklch(0.7_0.19_45)] text-base font-bold text-white hover:bg-[oklch(0.65_0.19_45)] cta-pulse"
                 >
                   Get Early Access — Free
                 </Button>
               </div>
             </div>
-          </div>
-        </AnimatedSection>
+          </AnimatedSection>
+        </div>
       </div>
     </section>
   );
@@ -486,21 +539,21 @@ function PricingSection() {
 const testimonials = [
   {
     quote:
-      "I used to lose $500+ per job because I'd forget materials. SimpleQuote caught everything.",
+      "Honestly I was just winging it before. I'd walk through a job, do the math in my head on the drive home, then text the customer a number. Forgot disposal fees like every time. This thing saved my ass on a repipe last month — caught $600 in fittings I would've eaten.",
     name: "Mike R.",
     trade: "Plumber",
     location: "Tampa FL",
   },
   {
     quote:
-      "My customers started taking me more seriously when I showed up with a real quote instead of a number on a napkin.",
+      "A GC told me I got the job over two other guys because my quote looked legit. The other bids were literally texts. That's it, that's the whole reason. Kinda wild how much presentation matters.",
     name: "Sarah K.",
     trade: "Electrician",
     location: "Denver CO",
   },
   {
     quote:
-      "I converted a quote to an invoice in literally one tap. My wife thought I hired a bookkeeper.",
+      "The invoice thing is what got me. I'd finish a job, say I'll send the invoice later, then forget for like two weeks. Now I just hit one button right there on site. My wife asked if I hired someone lol.",
     name: "Carlos M.",
     trade: "HVAC Tech",
     location: "Houston TX",
@@ -598,6 +651,11 @@ const faqs = [
       "Yes. Bank-level encryption (AES-256), secure cloud backup, and we never sell your data. Your client info stays yours.",
   },
   {
+    question: "Is SimpleQuote really free?",
+    answer:
+      "Yes. The free plan gives you 3 quotes and 3 invoices per month with no credit card required — forever. If you need unlimited everything plus e-signatures, live tracking, and QuickBooks sync, the Pro plan is $4.99/mo for the first 500 signups (normally $9.99).",
+  },
+  {
     question: "When does it launch?",
     answer:
       "We're in early access now. Sign up to lock in early bird pricing and be first in line.",
@@ -667,11 +725,11 @@ function FinalCTASection() {
             </p>
 
             <Button
-              onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth", block: "center" })}
               size="lg"
               className="h-14 rounded-xl bg-[oklch(0.7_0.19_45)] px-8 text-lg font-bold text-white hover:bg-[oklch(0.65_0.19_45)] cta-pulse"
             >
-              Get Early Access — $4.99/mo locked in forever
+              Get Early Access — Start Free
             </Button>
           </div>
         </AnimatedSection>
