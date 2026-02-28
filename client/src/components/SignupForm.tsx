@@ -94,7 +94,7 @@ export function SignupForm({ onSuccess, variant = "hero" }: SignupFormProps) {
         </div>
         <div className="sm:w-52">
           <Select value={tradeType} onValueChange={setTradeType}>
-            <SelectTrigger className="h-12 w-full rounded-xl border-[oklch(1_0_0_/_15%)] bg-[oklch(0.15_0.02_280)] text-white data-[placeholder]:text-[oklch(0.5_0_0)]">
+            <SelectTrigger className="h-12 !w-full rounded-xl border-[oklch(1_0_0_/_15%)] bg-[oklch(0.15_0.02_280)] px-4 text-sm text-white shadow-none data-[placeholder]:text-[oklch(0.5_0_0)] focus-visible:border-[oklch(0.7_0.19_45)] focus-visible:ring-[oklch(0.7_0.19_45_/_30%)]">
               <SelectValue placeholder="Your trade" />
             </SelectTrigger>
             <SelectContent className="rounded-xl bg-[oklch(0.2_0.02_280)] border-[oklch(1_0_0_/_15%)]">
